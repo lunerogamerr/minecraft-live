@@ -3,62 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Live Control</title>
+    <title>Minecraft Live Control - Pro</title>
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <style>
-        body { background: #1a1a1a; color: #fff; font-family: 'Courier New', monospace; text-align: center; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #3c3c3c; border: 5px solid #000; padding: 20px; width: 90%; max-width: 400px; box-shadow: 10px 10px 0px #222; }
-        h1 { color: #55FF55; text-shadow: 2px 2px #000; font-size: 20px; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 3px solid #000; background: #bdbdbd; box-sizing: border-box; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px; }
-        button { border: 3px solid #000; padding: 10px; font-weight: bold; cursor: pointer; font-family: inherit; }
-        .btn-log { background: #54fb54; width: 48%; }
-        .btn-reg { background: #4a90e2; width: 48%; color: #fff; }
-        .btn-acc { background: #444; color: #fff; font-size: 11px; }
-        .btn-tnt { background: #ff5555 !important; color: #fff; }
-        .stats { font-size: 24px; color: #FFFF55; margin: 10px 0; }
-        .cat { grid-column: span 2; color: #55FF55; font-size: 10px; border-bottom: 1px solid #555; text-align: left; margin-top: 10px; }
+        body { 
+            background-color: #1a1a1a; 
+            color: #fff; 
+            font-family: 'Courier New', Courier, monospace; 
+            text-align: center; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .box { 
+            background: #3c3c3c; 
+            border: 5px solid #000; 
+            padding: 20px; 
+            width: 420px; 
+            box-shadow: 10px 10px 0px #222; 
+        }
+
+        h1 { 
+            color: #55FF55; 
+            text-shadow: 2px 2px #000; 
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        p { font-size: 13px; color: #bfbfbf; margin: 5px 0; }
+
+        input { 
+            width: 100%; padding: 10px; margin: 8px 0; border: 3px solid #000; 
+            background: #bdbdbd; color: #000; font-weight: bold; font-family: 'Courier New', Courier, monospace;
+            box-sizing: border-box;
+        }
+
+        .btn-container { display: flex; gap: 8px; margin-top: 10px; }
+        
+        button { 
+            border: 3px solid #000; padding: 10px; font-weight: bold; cursor: pointer; 
+            font-family: 'Courier New', Courier, monospace; font-size: 12px;
+        }
+
+        .btn-login { background: #54fb54; color: #000; flex: 1; }
+        .btn-register { background: #4a90e2; color: #fff; flex: 1; }
+        
+        button:disabled { background: #555 !important; color: #888 !important; cursor: not-allowed; border-color: #333; }
+
+        .stats { font-size: 32px; color: #FFFF55; margin: 10px 0; font-weight: bold; }
+
+        /* --- GRID DE ACCIONES --- */
+        .grid-acciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 5px;
+            text-align: left;
+        }
+
+        .cat-title { 
+            grid-column: span 2; 
+            color: #55FF55; 
+            font-size: 11px; 
+            margin-top: 10px; 
+            border-bottom: 1px solid #555;
+            padding-bottom: 2px;
+        }
+
+        .btn-accion { 
+            background: #444; 
+            color: #fff; 
+            font-size: 10px; 
+            padding: 8px 4px; 
+            width: 100%;
+        }
+        
+        .btn-accion:hover { background: #555; }
+        .btn-peligro { background: #ff5555 !important; color: #fff; }
+
+        .timer-box {
+            background: #222; 
+            border: 2px solid #000; 
+            padding: 8px; 
+            margin-bottom: 15px;
+        }
+        .timer-display { font-size: 22px; color: #fff; font-weight: bold; }
+
         #game-section { display: none; }
     </style>
 </head>
 <body>
+
     <div class="box">
         <h1>MINECRAFT LIVE</h1>
+        
         <div id="login-section">
+            <p>Identifícate para jugar</p>
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="pass" placeholder="Contraseña">
-            <div style="display: flex; justify-content: space-between;">
-                <button class="btn-log" onclick="login()">ENTRAR</button>
-                <button class="btn-reg" onclick="register()">UNIRSE</button>
+            <div class="btn-container">
+                <button class="btn-login" onclick="login()">ENTRAR</button>
+                <button class="btn-register" onclick="register()">REGISTRAR</button>
             </div>
         </div>
+
         <div id="game-section">
+            <p id="welcome-msg">¡Hola!</p>
             <div class="stats">⭐ <span id="puntos">0</span></div>
-            <p style="font-size: 10px;">NUEVOS PUNTOS EN: <span id="timer">03:00</span></p>
-            <div class="grid">
-                <div class="cat">MOBS</div>
-                <button class="btn-acc" onclick="canjear('zombie', 20)">Zombie (20)</button>
-                <button class="btn-acc" onclick="canjear('creeper', 70)">Creeper (70)</button>
-                <button class="btn-acc" onclick="canjear('esqueleto', 30)">Esqueleto (30)</button>
-                <button class="btn-acc" onclick="canjear('enderman', 100)">Enderman (100)</button>
-                <div class="cat">ITEMS</div>
-                <button class="btn-acc" onclick="canjear('pan', 10)">Pan (10)</button>
-                <button class="btn-acc" onclick="canjear('diamante', 350)">Diamante (350)</button>
-                <button class="btn-acc" onclick="canjear('notch', 2000)">M. Notch (2000)</button>
-                <div class="cat">CAOS</div>
-                <button class="btn-acc btn-tnt" onclick="canjear('tnt', 120)">TNT (120)</button>
-                <button class="btn-acc btn-tnt" onclick="canjear('tnt10', 1500)">10 TNT (1500)</button>
+            
+            <div class="timer-box">
+                <p style="font-size: 10px; color: #55FF55; margin:0;">NUEVOS PUNTOS EN:</p>
+                <div id="timer" class="timer-display">03:00</div>
             </div>
+
+            <div class="grid-acciones">
+                <div class="cat-title">MOBS (Enemigos y Amigos)</div>
+                <button class="btn-accion" onclick="canjear('lepisma', 10)">Lepisma (10)</button>
+                <button class="btn-accion" onclick="canjear('zombie', 20)">Zombie (20)</button>
+                <button class="btn-accion" onclick="canjear('esqueleto', 30)">Esqueleto (30)</button>
+                <button class="btn-accion" onclick="canjear('slime', 50)">Slime (50)</button>
+                <button class="btn-accion" onclick="canjear('creeper', 70)">Creeper (70)</button>
+                <button class="btn-accion" onclick="canjear('enderman', 100)">Enderman (100)</button>
+                <button class="btn-accion" onclick="canjear('minizombie', 100)">Baby Zombie (100)</button>
+                <button class="btn-accion" onclick="canjear('lobo', 120)">Lobo (120)</button>
+                <button class="btn-accion" onclick="canjear('blaze', 500)">Blaze (500)</button>
+
+                <div class="cat-title">ITEMS (Recursos)</div>
+                <button class="btn-accion" onclick="canjear('madera', 5)">Madera (5)</button>
+                <button class="btn-accion" onclick="canjear('pan', 10)">Pan (10)</button>
+                <button class="btn-accion" onclick="canjear('hierro', 60)">Hierro (60)</button>
+                <button class="btn-accion" onclick="canjear('manzana', 140)">M. Dorada (140)</button>
+                <button class="btn-accion" onclick="canjear('diamante', 350)">Diamante (350)</button>
+                <button class="btn-accion" onclick="canjear('notch', 2000)">M. NOTCH (2000)</button>
+
+                <div class="cat-title">¡PELIGRO EXPLOSIVO!</div>
+                <button class="btn-accion btn-peligro" onclick="canjear('tnt', 120)">TNT (120)</button>
+                <button class="btn-accion btn-peligro" onclick="canjear('tnt10', 1500)">¡10 TNT! (1500)</button>
+            </div>
+
+            <br>
+            <button onclick="cerrarSesion()" style="background:#222; border-color: #444; color: #aaa; width: auto; font-size: 10px;">Cerrar Sesión</button>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN (Cambia URL_PLUGIN cada vez que abras Ngrok)
-        const URL_PLUGIN = "https://TU-URL-DE-NGROK.ngrok-free.app"; 
-        const NICK = "PrepPankaque7291";
-
+        // --- CONFIGURACIÓN ---
         const firebaseConfig = {
             apiKey: "AIzaSyBpchWlSf24b_KzkmOYWqBJtpsfc8wA5pM",
             authDomain: "minecraft-stream-points.firebaseapp.com",
@@ -68,6 +168,10 @@
             appId: "1:112471241536:web:02f66e6e6d0958d6a5c0a5"
         };
 
+        const NICK_MINECRAFT = "PrepPankaque7291"; 
+        const URL_PLUGIN = "https://e6d3-84-77-63-187.ngrok-free.app"; // <--- ACTUALIZA ESTO SI CAMBIA NGROK
+
+        // --- INICIO FIREBASE ---
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -76,47 +180,81 @@
             if (user) {
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('game-section').style.display = 'block';
-                iniciarSistema(user.uid);
+                document.getElementById('welcome-msg').innerText = "¡Hola " + user.email.split('@')[0] + "!";
+                escucharPuntos(user.uid);
+                iniciarContadorVisual(user.uid);
+            } else {
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('game-section').style.display = 'none';
+                if (window.intervaloVisual) clearInterval(window.intervaloVisual);
             }
         });
 
+        // --- CANJEAR ACCIÓN (CORREGIDO) ---
         async function canjear(tipo, coste) {
-            const user = auth.currentUser;
-            const doc = await db.collection("usuarios").doc(user.uid).get();
-            const pts = doc.data().puntos || 0;
+            const uid = auth.currentUser.uid;
+            try {
+                const doc = await db.collection("usuarios").doc(uid).get();
+                const pts = doc.data().puntos || 0;
 
-            if (pts >= coste) {
-                // FETCH ESPECIAL PARA EVITAR BLOQUEOS EN MÓVIL
-                fetch(`${URL_PLUGIN}/accion?player=${NICK}&tipo=${tipo}`, {
-                    method: 'GET',
-                    mode: 'no-cors',
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
+                if (pts >= coste) {
+                    // LLAMADA AL PLUGIN USANDO EL TRUCO DE LA IMAGEN
+                    const urlFinal = `${URL_PLUGIN}/accion?player=${NICK_MINECRAFT}&tipo=${tipo}`;
+                    const img = new Image();
+                    img.src = urlFinal;
 
-                await db.collection("usuarios").doc(user.uid).update({
-                    puntos: firebase.firestore.FieldValue.increment(-coste)
-                });
-            } else { alert("¡Faltan puntos!"); }
+                    // Restamos puntos
+                    await db.collection("usuarios").doc(uid).update({
+                        puntos: firebase.firestore.FieldValue.increment(-coste)
+                    });
+                    
+                    console.log("Acción enviada: " + tipo);
+                } else {
+                    alert("Te faltan " + (coste - pts) + " puntos.");
+                }
+            } catch (e) { alert("Error al canjear."); }
         }
 
-        function iniciarSistema(uid) {
+        // --- SISTEMA DE PUNTOS Y TIEMPO ---
+        function escucharPuntos(uid) {
             db.collection("usuarios").doc(uid).onSnapshot(doc => {
-                document.getElementById('puntos').innerText = doc.data()?.puntos || 0;
+                let pts = doc.exists ? (doc.data().puntos || 0) : 0;
+                if (!doc.exists) db.collection("usuarios").doc(uid).set({ puntos: 0 });
+                document.getElementById('puntos').innerText = pts;
             });
-            let t = 180;
-            setInterval(() => {
-                t--;
-                let m = Math.floor(t/60), s = t%60;
-                document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
-                if(t <= 0) { 
-                    t = 180; 
-                    db.collection("usuarios").doc(uid).update({puntos: firebase.firestore.FieldValue.increment(10)});
+        }
+
+        let tiempoRestante = 180;
+        function iniciarContadorVisual(uid) {
+            if (window.intervaloVisual) clearInterval(window.intervaloVisual);
+            tiempoRestante = 180;
+            window.intervaloVisual = setInterval(() => {
+                tiempoRestante--;
+                let min = Math.floor(tiempoRestante / 60);
+                let seg = tiempoRestante % 60;
+                document.getElementById('timer').innerText = (min < 10 ? "0" : "") + min + ":" + (seg < 10 ? "0" : "") + seg;
+
+                if (tiempoRestante <= 0) {
+                    tiempoRestante = 180;
+                    db.collection("usuarios").doc(uid).update({ puntos: firebase.firestore.FieldValue.increment(10) });
                 }
             }, 1000);
         }
 
-        function login() { auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value); }
-        function register() { auth.createUserWithEmailAndPassword(document.getElementById('email').value, document.getElementById('pass').value); }
+        // --- LOGIN / REGISTER ---
+        async function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            try { await auth.signInWithEmailAndPassword(email, pass); } catch (e) { alert(e.message); }
+        }
+
+        async function register() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            try { await auth.createUserWithEmailAndPassword(email, pass); } catch (e) { alert(e.message); }
+        }
+
+        function cerrarSesion() { auth.signOut(); }
     </script>
 </body>
 </html>
